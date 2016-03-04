@@ -11,15 +11,14 @@ Prerequisites
 - Fork this repo
 - Clone your repository
  - This is where you will document your progress and commit the project
-- Create a docker container or a virtual machine using Vagrant (<http://www.vagrantup.com/>) and PuPHPet (<https://puphpet.com/>) with PHP 5.4 or greater
- - Alternatively just use your php environment with PHP 5.4 or greater (not recommended)
+- Create a Docker container or a virtual machine using Vagrant (<http://www.vagrantup.com/>) and PuPHPet (<https://puphpet.com/>) with PHP 5.4 or greater
 
 Task
 ----
 
 You will be creating a "File Management System".
 
-You should use Phalcon as MVC framework but alternatively you can use the solution you think suits best.
+You may use Phalcon as MVC framework (preferred) or alternatively you can use the solution you think suits best.
 
 You may use a storage engine of your choice, for example MySQL, Sqlite or flat files. If you choose to use MySQL or another SQL database then please provide a schema dump.
 
