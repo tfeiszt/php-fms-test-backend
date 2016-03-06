@@ -1,0 +1,41 @@
+.navbar{
+    border-radius: 0px;
+}
+
+.manager {
+    .manager-left {
+      @media (min-width: 768px) {
+        padding: 0 4px 0 0;
+      }
+      @media (max-width: 767px) {
+        padding: 4px 0px;
+      }
+    }
+    .manager-right{
+      @media (min-width: 768px) {
+          padding: 0 0 0 4px;
+      }
+      @media (max-width: 767px) {
+        padding: 4px 0px;
+      }
+    }
+
+    .manager-list {
+        border: solid 1px #3e3f3a;
+        min-height: 300px;
+
+        .manager-header {
+            background-color: #3e3f3a;
+            color: #fff;
+        }
+        .manager-header.active {
+          background-color: #93c54b;
+          color: #fff;
+        }
+    }
+    .manager-actions{
+        background-color: #3e3f3a;
+        padding:4px;
+        margin-top: 4px;
+    }
+}

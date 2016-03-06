@@ -1,0 +1,24 @@
+This is my first Phalcon projects, so I played a bit with that before I fork this repo.
+For first sight: It's pretty usable, seems fine. I like the structure of the codebase. Only problem is: it was a headache to build a correct source on my local MAMP.
+
+The task: I should create a "File manager system". Task description doesn't mention any exact expectations how should it work, but mention I can use db if I want.
+I checked the attached interfaces and those implies it should be handle actually files too.
+So my goal is: I trying to make a web application which is like an old "Norton Commander". It has two file list panel and an action bar. User can do the basic file actions such as:
+- creating a txt file
+- creating a folder
+- copy a file
+- move a file (using the move to rename as well)
+- delete a file
+
+All this actions will be logged into a mysql table.
+
+For this I will use the following technologies:
+- PHP 5.5.10
+- Mysql 5.5
+- Phalcon 2.x
+- jQuery
+- Bootstrap 3
+- less
+- npm
+- grunt
+
