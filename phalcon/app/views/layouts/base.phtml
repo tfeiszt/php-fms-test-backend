@@ -1,9 +1,21 @@
 <?php
 
 use Phalcon\Mvc\Url;
+use Phalcon\DI\FactoryDefault;
 
-$url = new Url();
+
+$di = \Phalcon\DI\FactoryDefault::getDefault();
+$url = $di->getShared('url');
 ?>
+
+<script>
+    var objData = [];
+    objData['root_url'] = '<?php echo $url->getBaseUri();?>';
+    objData['environment'] = 'dev';
+    $(document).ready(function(){
+       jasApp.init(objData)
+    });
+</script>
 
 <nav class="navbar navbar-default">
     <div class="container-fluid">

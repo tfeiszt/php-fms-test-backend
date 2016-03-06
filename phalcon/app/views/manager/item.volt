@@ -1,0 +1,1 @@
+<li><label>{{item.getName()}}</label></li>

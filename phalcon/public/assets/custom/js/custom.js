@@ -2,6 +2,7 @@ if (typeof jasApp == "undefined") var jasApp = new Object();
 
 jasApp = {
 
+    rootUrl: '',
     csrfName: '',
     csrfValue: '',
     csrf: null,
@@ -9,6 +10,7 @@ jasApp = {
     environment: 'dev',
 
     init: function(objData){
+        this.rootUrl = objData['root_url'];
         this.csrfName = objData['csrf_name'];
         this.csrfValue = objData['csrf_value'];
         this.csrf = objData['csrf'];
@@ -202,6 +204,84 @@ jasHttp = {
 
 }
 
+
+if (typeof controlService == "undefined") var controlService = new Object();
+
+controlService = {
+
+    scope: {
+        data: null
+    },
+    controller: null,
+    modalFormFile: null,
+    modalFormFolder: null,
+    left: null,
+    right: null,
+
+    init: function(objData, left, right){
+        this.modalFormFile = objData['modal_form_file'];
+        this.modalFormFolder = objData['modal_form_folder'];
+        this.controller = objData['controller'];
+        this.left = left;
+        this.right = right;
+
+        this.controller.find('.btn-create-file').unbind('click');
+        this.controller.find('.btn-create-file').bind('click', function(){
+            controlService.modalFormFile.find('.modal-title').html('Create Textfile');
+            controlService.createFile();
+            return false;
+        });
+        this.controller.find('.btn-create-folder').unbind('click');
+        this.controller.find('.btn-create-folder').bind('click', function(){
+            controlService.modalFormFolder.find('.modal-title').html('Create New Folder');
+            controlService.createFolder();
+            return false;
+        });
+        this.modalFormFile.find('#newFileSave').unbind('click');
+        this.modalFormFile.find('#newFileSave').bind('click', function(){
+            controlService.saveFile();
+            return false;
+        });
+        this.modalFormFolder.find('#newFolderSave').unbind('click');
+        this.modalFormFolder.find('#newFolderSave').bind('click', function(){
+            controlService.saveFolder();
+            return false;
+        });
+
+        controlService.left.getList(controlService.left);
+        controlService.right.getList(controlService.right);
+    },
+
+
+    createFile: function() {
+        this.modalFormFile.modal('show');
+    },
+
+    createFolder: function() {
+        this.modalFormFolder.modal('show');
+    },
+
+
+    saveFile: function() {
+        data = this.modalFormFile.find('form').serialize();
+        jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFile', data, function (json) {
+            controlService.left.getList(controlService.left);
+            controlService.right.getList(controlService.right);
+            controlService.modalFormFile.modal('hide');
+        });
+
+    },
+
+    saveFolder: function() {
+        data = this.modalFormFolder.find('form').serialize();
+        jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFolder', data, function (json) {
+            controlService.left.getList(controlService.left);
+            controlService.right.getList(controlService.right);
+            controlService.modalFormFolder.modal('hide');
+        });
+    }
+
+}
 
 
 
