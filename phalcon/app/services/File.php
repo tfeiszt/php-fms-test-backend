@@ -1,5 +1,6 @@
 <?php
 
+
 Class File implements FileInterface
 {
     protected $name;
@@ -8,6 +9,18 @@ Class File implements FileInterface
     protected $size;
     protected $parentFolder;
     protected $fileContent;
+
+
+    public function __construct($pathAndName)
+    {
+        $this->setName(pathinfo($pathAndName, PATHINFO_BASENAME));
+        $this->setParentFolder(new Folder(pathinfo($pathAndName, PATHINFO_DIRNAME)));
+        if (file_exists($pathAndName)){
+            $this->setCreatedTime(filectime($pathAndName));
+            $this->setModifiedTime(filemtime($pathAndName));
+            $this->setSize(filesize($pathAndName));
+        }
+    }
 
     /**
      * @return string
@@ -31,7 +44,7 @@ Class File implements FileInterface
      */
     public function getSize()
     {
-        return 0;
+        return $this->size;
     }
 
     /**

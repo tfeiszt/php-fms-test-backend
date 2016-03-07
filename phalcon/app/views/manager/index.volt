@@ -8,7 +8,7 @@
             <div class="col-lg-6 col-md-6 col-sm-6 manager-left">
                 <div class="col-lg-12 manager-list">
                     <div class="row">
-                        <div class="col-lg-12 manager-header active">
+                        <div id="result-list-left-header" class="col-lg-12 manager-header active">
                             Header
                         </div>
                     </div>
@@ -23,14 +23,15 @@
             <div class="col-lg-6 col-md-6 col-sm-6 manager-right">
                 <div class="col-lg-12 manager-list">
                     <div class="row">
-                        <div class="col-lg-12 manager-header">
+                        <div id="result-list-right-header" class="col-lg-12 manager-header">
                             Header
                         </div>
                     </div>
                     <div class="row">
-                        <ul class="result-list">
+                        <ul id="result-list-right" class="result-list">
 
                         </ul>
+                        <div id="result-list-right-pagination"></div>
                     </div>
                 </div>
             </div>
@@ -39,8 +40,8 @@
             <div id="controller" class="col-lg-12 manager-actions text-center">
                 <a class="btn btn-success btn-create-file" href="">Create File</a>
                 <a class="btn btn-success btn-create-folder" href="">Create Folder</a>
-                <a class="btn btn-primary" href="">Copy</a>
-                <a class="btn btn-primary" href="">Move</a>
+                <a class="btn btn-success" href="">Copy</a>
+                <a class="btn btn-success" href="">Move</a>
                 <a class="btn btn-danger" href="">Delete</a>
             </div>
         </div>
@@ -66,6 +67,7 @@
                         <label for="content">Content</label>
                         <textarea type="text" class="form-control" id="content" placeholder="" name="content"></textarea>
                     </div>
+                    <input type="hidden" name="parent" value="">
                 </form>
 
             </div>
@@ -91,6 +93,7 @@
                         <label for="name">Folder Name</label>
                         <input type="text" class="form-control" id="name" placeholder="Folder Name" value="" name="name">
                     </div>
+                    <input type="hidden" name="parent" value="">
                 </form>
 
             </div>
@@ -112,23 +115,25 @@
         initData['default_url'] = jasApp.rootUrl + '/manager/scanFolder';
         initData['id_grid_item'] = $('#result-list-left');
         initData['id_pagination_item'] = $('#result-list-left-pagination');
+        initData['id_header_item'] = $('#result-list-left-header');
         initData['behaviour'] = [];
         initData['behaviour']['infinity'] = false;
         initData['behaviour']['refresh_after_delete'] = true;
         initData['behaviour']['no_result'] = '<div class="alert alert-warning">No data has found</div>'; //optional
 
-        leftGrid = new jasGridInstance('table',initData);
+        var leftGrid = new jasGridInstance('left',initData);
 
         initData = new Array();
         initData['default_url'] = jasApp.rootUrl + '/manager/scanFolder';
         initData['id_grid_item'] = $('#result-list-right');
         initData['id_pagination_item'] = $('#result-list-right-pagination');
+        initData['id_header_item'] = $('#result-list-right-header');
         initData['behaviour'] = [];
         initData['behaviour']['infinity'] = false;
         initData['behaviour']['refresh_after_delete'] = true;
         initData['behaviour']['no_result'] = '<div class="alert alert-warning">No data has found</div>'; //optional
 
-        rightGrid = new jasGridInstance('table',initData);
+        var rightGrid = new jasGridInstance('right',initData);
 
         var initData = new Array();
         initData['controller'] = $('#controller');

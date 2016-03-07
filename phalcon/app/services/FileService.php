@@ -105,7 +105,7 @@ Class FileService
         $messages = $validation->validate($_POST);
         if (count($messages) === 0) {
             $parent = new Folder(($request->getPost('parent') != '') ? $request->getPost('parent') : $this->configuration->rootFolder);
-            $folder = new Folder($parent->getPath() . $request->getPost('name'));
+            $folder = new Folder($this->fileSystem->setPathSlash($parent->getPath()) . $request->getPost('name'));
 
             if (!$this->isFolderExists($folder->getPath())) {
                 $result['data'] = $this->fileSystem->createFolder($folder, $parent);
@@ -123,15 +123,80 @@ Class FileService
 
     public function listFolder(Request $request)
     {
-        $result = array('success' => true, 'data' => null, 'message' => '');
+        $result = array('success' => true, 'data' => ['entry_point' => '', 'entities' => []], 'message' => '');
 
         $folder = new Folder(($request->getPost('folder') != '') ? $request->getPost('folder') : $this->configuration->rootFolder);
 
         if ($this->isFolderExists($folder->getPath())) {
-            $result['data'] = $this->fileSystem->getFiles($folder);
+            $result['data']['entry_point'] = str_replace(dirname($this->configuration->rootFolder), '', $folder->getPath());
+            $result['data']['entry_path'] =  $folder->getPath();
+            $result['data']['entities'] = $this->fileSystem->getFiles($folder);
         } else {
             $result['success'] = false;
             $result['message'] = 'Directory does not exist';
+        }
+        return $result;
+    }
+
+
+    public function copy(Request $request)
+    {
+        $result = array('success' => true, 'data' => ['entry_point' => '', 'entities' => []], 'message' => '');
+
+        $validation = new Validation();
+        $validation->add(
+            'name',
+            new PresenceOf(
+                array(
+                    'message' => 'The name is required'
+                )
+            )
+        );
+        $validation->add(
+            'target',
+            new PresenceOf(
+                array(
+                    'message' => 'The target folder is required'
+                )
+            )
+        );
+        $validation->add(
+            'source',
+            new PresenceOf(
+                array(
+                    'message' => 'The source folder is required'
+                )
+            )
+        );
+        $messages = $validation->validate($_POST);
+        if (count($messages) === 0) {
+            $entry = $request->getPost('name');
+            $target = $request->getPost('target');
+            $source = $request->getPost('source');
+
+            if (file_exists($this->fileSystem->setPathSlash($source) . $entry) && (file_exists($target) && is_directory($target))){
+                if (is_directory($entry)) {
+                    $soruceFolder = new Folder($this->fileSystem->setPathSlash($source). $entry);
+                } else {
+                    $sourceFile =new File($this->fileSystem->setPathSlash($source) . $entry);
+
+                    $targetFolder =  new Folder($target);
+
+                    $file = new File();
+                    $file->setName($request->getPost('name'))
+                        ->setParentFolder($targetFolder)
+                        ->setContent($sourceFile->getContent());
+                    $result['data'] = $this->fileSystem->createFile($file, $targetFolder);
+                }
+
+            } else {
+                $result['success'] = false;
+                $result['message'] = 'Invalid directory or filename';
+            }
+
+        } else {
+            $result['success'] = false;
+            $result['message'] = $this->concateMessages($messages);
         }
         return $result;
     }

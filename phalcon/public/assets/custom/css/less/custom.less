@@ -45,10 +45,26 @@ p {
     }
 }
 
-ul.result-list li {
-  list-style: none;
+ul.result-list {
+    padding-right: 30px;
 
-  label.name{
-      font-weight: bold;
+    li.item {
+      list-style: none;
+      cursor: pointer;
+      border-bottom: dotted 1px #cfcfcf;
+
+      label.name{
+        font-weight: bold;
+        cursor: pointer;
+      }
+
+      label.size {
+        font-wight: normal;
+      }
+    }
+  li.item.selected {
+
+      background-color: #efefef;
+
   }
 }

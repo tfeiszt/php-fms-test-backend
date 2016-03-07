@@ -12,7 +12,7 @@ Class Folder implements FolderInterface
     public function __construct($pathAndName)
     {
         $this->setName(pathinfo($pathAndName, PATHINFO_BASENAME));
-        $this->setPath($pathAndName);
+        $this->setPath(realpath($pathAndName));
         if (file_exists($pathAndName)){
             $this->setCreatedTime(filemtime($pathAndName));
         }

@@ -215,15 +215,15 @@ controlService = {
     controller: null,
     modalFormFile: null,
     modalFormFolder: null,
-    left: null,
-    right: null,
+    grids: [],
 
     init: function(objData, left, right){
         this.modalFormFile = objData['modal_form_file'];
         this.modalFormFolder = objData['modal_form_folder'];
         this.controller = objData['controller'];
-        this.left = left;
-        this.right = right;
+        this.grids.push(left);
+        this.grids.push(right);
+
 
         this.controller.find('.btn-create-file').unbind('click');
         this.controller.find('.btn-create-file').bind('click', function(){
@@ -248,16 +248,43 @@ controlService = {
             return false;
         });
 
-        controlService.left.getList(controlService.left);
-        controlService.right.getList(controlService.right);
+        for(var i = 0; i < this.grids.length; i++ ){
+            this.grids[i].getList(this.grids[i]);
+        }
+
+    },
+
+    getActiveGrid: function(){
+        for(var i = 0; i < this.grids.length; i++){
+            if (this.grids[i].idGridHeaderItem.hasClass('active')){
+                return this.grids[i];
+            }
+        }
+        return false;
+    },
+
+    refreshActiveGrid: function(){
+        grid = this.getActiveGrid();
+        grid.getList(grid);
+    },
+
+
+    refreshGrids: function(){
+        for(var i = 0; i < this.grids.length; i++){
+            this.grids[i].getList(this.grids[i]);
+        }
     },
 
 
     createFile: function() {
+        var activeGrid = this.getActiveGrid();
+        this.modalFormFile.find('input[name="parent"]').val(activeGrid.scope.data.data.entry_path);
         this.modalFormFile.modal('show');
     },
 
     createFolder: function() {
+        var activeGrid = this.getActiveGrid();
+        this.modalFormFolder.find('input[name="parent"]').val(activeGrid.scope.data.data.entry_path);
         this.modalFormFolder.modal('show');
     },
 
@@ -265,8 +292,7 @@ controlService = {
     saveFile: function() {
         data = this.modalFormFile.find('form').serialize();
         jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFile', data, function (json) {
-            controlService.left.getList(controlService.left);
-            controlService.right.getList(controlService.right);
+            controlService.refreshGrids();
             controlService.modalFormFile.modal('hide');
         });
 
@@ -275,11 +301,21 @@ controlService = {
     saveFolder: function() {
         data = this.modalFormFolder.find('form').serialize();
         jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFolder', data, function (json) {
-            controlService.left.getList(controlService.left);
-            controlService.right.getList(controlService.right);
+            controlService.refreshGrids();
             controlService.modalFormFolder.modal('hide');
         });
+    },
+
+    setActiveByName: function(name) {
+        for(var i = 0; i < this.grids.length; i++){
+            this.grids[i].idGridHeaderItem.removeClass('active');
+            if (this.grids[i].name == name) {
+                this.grids[i].idGridHeaderItem.addClass('active');
+
+            }
+        }
     }
+
 
 }
 

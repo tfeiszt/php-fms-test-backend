@@ -44,6 +44,18 @@ Class FileSystem implements FileSystemInterface
     }
 
 
+    private function sortByName($items)
+    {
+        $sorted = array();
+        foreach ($items as $key => $itemObject)
+        {
+            $sorted[$key] = $itemObject->getName();
+        }
+        array_multisort($sorted, SORT_ASC, $items);
+        return $items;
+    }
+
+
     /**
      * @param FileInterface   $file
      * @param FolderInterface $parent
@@ -201,15 +213,25 @@ Class FileSystem implements FileSystemInterface
     public function getFiles(FolderInterface $folder)
     {
         $result = [];
+        $folders = [];
+        $files = [];
         if ($handle = opendir($folder->getPath())) {
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != ".") {
-                    $result[] = new Folder($entry); //TODO
+                    if (is_dir($this->setPathSlash($folder->getPath()) . $entry)) {
+                        $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
+                    } else {
+                        $files[] = new File($this->setPathSlash($folder->getPath()) . $entry); //TODO
+                    }
                 }
             }
             closedir($handle);
         }
 
+        $folders = $this->sortByName($folders);
+        $files = $this->sortByName($files);
+        $result = array_merge($result, $folders);
+        $result = array_merge($result, $files);
         return $result;
     }
 }

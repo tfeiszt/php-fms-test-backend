@@ -16,9 +16,9 @@ jasGridService = {
         jasHttp.getData(grid.scope, function(scope, res){
             grid.scope = scope;
             loading.fadeOut();
-            grid.showList(grid, scope, res)
+            grid.showList(grid, scope, jasHelper.parseResult(res));
 
-        }, function(scope, res){
+        }, function(scope, scope, res){
             jasHelper.errorHandler(res)
             loading.fadeOut();
         });
@@ -27,12 +27,13 @@ jasGridService = {
 
     getExternalAjaxList: function(grid, externalData){
         externalData[jasApp.csrfName] = jasApp.csrfValue;
-        grid.scope.url = id.defaultUrl;
+        grid.scope.url = grid.defaultUrl;
         grid.scope.data = null;
         grid.scope.params = externalData;
 
-        jasHttp.getData(grid.scope, function(res){
-            grid.showList(grid, res)
+        jasHttp.getData(grid.scope, function(scope, res){
+            grid.scope = scope;
+            grid.showList(grid, scope, jasHelper.parseResult(res))
         }, function(){
             jasHelper.errorHandler(res)
         });
@@ -43,7 +44,7 @@ jasGridService = {
 
         res = jasHelper.parseResult(res);
 
-        if (res['success']){
+        if (res.success){
 
             if (! grid.behaviour.infinity) {
                 grid.clearSelected(grid);
@@ -59,7 +60,14 @@ jasGridService = {
             if (grid.idLimitSelectorItem){
                 grid.idLimitSelectorItem.empty();
             }
-            var a = res.data;
+
+
+            if (grid.idGridHeaderItem){
+                grid.idGridHeaderItem.empty();
+                grid.idGridHeaderItem.html(res.data.entry_point);
+            }
+
+            var a = res.data.entities;
 
 
             if (a){
@@ -131,6 +139,22 @@ jasGridService = {
             jasHelper.errorHandler(res);
             return false;
         }
+
+
+        var me = this;
+        grid.idGridItem.find('.item-folder .item-link').unbind('click');
+        grid.idGridItem.find('.item-folder .item-link').bind('click', function(){
+            var data = {folder: $(this).attr('data-folder')}
+            me.refreshList(me, data);
+        });
+
+        grid.idGridItem.find('li').bind('click', function(){
+            me.clearSelected();
+            me.setSelected($(this));
+        });
+
+        controlService.setActiveByName(grid.name);
+
 
         /*
          if (res.callbacks){
@@ -230,22 +254,6 @@ jasGridService = {
          */
     },
 
-    /*
-     saveToCsv: function(external_data){
-     var me = this;
-     external_data[me.csrfName] = me.csrfValue;
-     me.getResult(this.defaultUrl, external_data, function(json){
-     if (!(typeof json =='object')){
-     var res = jQuery.parseJSON(json);
-     } else
-     {
-     var res = json;
-     }
-     document.location = res.data;
-     });
-     },
-     */
-
     clearAjaxList: function(grid){
         grid.clearSelected();
         grid.idGridItem.empty();
@@ -253,43 +261,44 @@ jasGridService = {
     },
 
 
-    /*
+
      hasCiSelection: function(){
-     var me = this;
-     if (me.selectedItem){
-     return true;
-     } else
-     {
-     return false;
-     }
+         var me = this;
+         if (me.selectedItem){
+            return true;
+         } else
+         {
+            return false;
+         }
      },
 
 
      selectCiRow: function(row){
-     var me = this;
-     me.clearSelected();
-     me.selectedItem = row;
-     row.addClass(me.selected_class);
-     return false;
+
+         var me = this;
+         me.clearSelected();
+         me.selectedItem = row;
+         row.addClass(me.behaviour.selected_class);
+         return false;
      },
 
 
 
      getCiSelection: function(){
-     var me = this;
-     if (me.selectedItem){
-     return me.selectedItem;
-     } else
-     {
-     return false;
-     }
+         var me = this;
+         if (me.selectedItem){
+            return me.selectedItem;
+         } else
+         {
+            return false;
+         }
      },
-     */
+
 
     clearGridSelection: function(grid){
         var grid = this;
         if (grid.selectedItem){
-            grid.selectedItem.removeClass(grid.selected_class);
+            grid.selectedItem.removeClass(grid.behaviour.selected_class);
             grid.selectedItem = null;
         }
     }
@@ -315,6 +324,7 @@ function jasGridInstance(objname, objData){
     this.idGridItem = objData['id_grid_item'];
     this.idPaginationItem = objData['id_pagination_item'];
     this.idLimitSelectorItem = objData['id_limit_selector_item'];
+    this.idGridHeaderItem = objData['id_header_item'];
     this.selectedItem = false;
     this.lastClickedItem = null;
 
@@ -348,13 +358,11 @@ function jasGridInstance(objname, objData){
 
     this.refreshList = jasGridService.getExternalAjaxList;
 
-    //this.downloadList = saveToCsv;
+    this.isSelected = jasGridService.hasCiSelection;
 
-    //this.isSelected = hasCiSelection;
+    this.setSelected = jasGridService.selectCiRow;
 
-    //this.setSelected = selectCiRow;
-
-    //this.getSelected = getCiSelection;
+    this.getSelected = jasGridService.getCiSelection;
 
     this.clearSelected = jasGridService.clearGridSelection;
 
@@ -365,29 +373,7 @@ function jasGridInstance(objname, objData){
     //this.hideLoader = hideAjaxLoader;
 
     this.clearList(this);
-    /*
-     var me = this;
-     if ($("#"+this.export_link)){
-     $("#"+this.export_link).unbind('click');
-     $("#"+this.export_link).bind('click', function(){
-     me.downloadList({'ci_export_link' : true} );
-     return false;
-     });
-     }
-     */
 
-}
-
-
-function jasLimitSelectorInstance(objName, objData, grid){
-    this.name =  objName;
-    this.idSelectorItem = objData['id_limit_selector_item'];
-    this.grid = grid;
-    var me = this;
-    this.idSelectorItem.bind('change', function(){
-        me.grid.scope.params['limit'] = $(this).val();
-        jasGridService.getAjaxList(me.grid);
-    });
 }
 
 
