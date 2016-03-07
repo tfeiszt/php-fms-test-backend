@@ -113,7 +113,11 @@ Class FileSystem implements FileSystemInterface
      */
     public function createRootFolder(FolderInterface $folder)
     {
-        return $folder;
+        if (! file_exists($this->setPathSlash($folder->getPath()))){
+            mkdir($this->setPathSlash($folder->getPath()), 0775, true);
+            $this->rootFolder = new Folder($this->setPathSlash($folder->getPath())); //Using this way, created time has been completed.
+        }
+        return $this->rootFolder;
     }
 
     /**
@@ -133,7 +137,7 @@ Class FileSystem implements FileSystemInterface
     public function createFolder( FolderInterface $folder, FolderInterface $parent)
     {
         mkdir($this->setPathSlash($parent->getPath()) . $folder->getName(), 0775, true);
-        return $folder;
+        return new Folder($this->setPathSlash($parent->getPath()) . $folder->getName());
     }
 
 
@@ -143,8 +147,13 @@ Class FileSystem implements FileSystemInterface
      * @return bool
      */
     public function deleteFolder(FolderInterface $folder){
-        return true;
+        $files = array_diff(scandir($folder->getPath()), array('.','..'));
+        foreach ($files as $fileOrFolder) {
+            (is_dir($this->setPathSlash($folder->getPath()) . $fileOrFolder)) ? delTree($this->setPathSlash($folder->getPath()) . $fileOrFolder) : unlink($this->setPathSlash($folder->getPath()) . $fileOrFolder);
+        }
+        return rmdir($this->setPathSlash($folder->getPath()));
     }
+
 
     /**
      * @param FolderInterface $folder
@@ -163,7 +172,16 @@ Class FileSystem implements FileSystemInterface
      */
     public function getFolderCount(FolderInterface $folder)
     {
-        return 0;
+        $tmp = $this->getFolders($folder);
+        $result = 0;
+        foreach($tmp as $item) {
+            if (get_class($item) == 'Folder') {
+                $result += $this->getFileCount($item);
+            } else {
+                $result++;
+            }
+        }
+        return $result;
     }
 
     /**
@@ -173,7 +191,13 @@ Class FileSystem implements FileSystemInterface
      */
     public function getFileCount(FolderInterface $folder)
     {
-        return 0;
+        $tmp = $this->getFiles($folder);
+        $result = count($tmp);
+        $tmp = $this->getFolders($folder);
+        foreach($tmp as $item) {
+           $result += $this->getFileCount($item);
+        }
+        return $result;
     }
     /**
      * @param FolderInterface $folder
@@ -182,7 +206,16 @@ Class FileSystem implements FileSystemInterface
      */
     public function getDirectorySize(FolderInterface $folder)
     {
-        return 0;
+        $result = 0;
+        $tmp = $this->getFiles($folder);
+        foreach($tmp as $item) {
+            $result += $item->getSize();
+        }
+        $tmp = $this->getFolders($folder);
+        foreach($tmp as $item) {
+            $result += $this->getFileCount($item);
+        }
+        return $result;
     }
 
     /**
@@ -195,13 +228,17 @@ Class FileSystem implements FileSystemInterface
         $result = [];
         if ($handle = opendir($folder->getPath())) {
             while (false !== ($entry = readdir($handle))) {
-                if (is_directory($entry)) {
-                    $result[] =  new Folder($entry);
+                if (is_dir($this->setPathSlash($folder->getPath()) . $entry)) {
+                    if (($entry != ".") && ($entry != "..")) {
+                        $result[] = new Folder($this->setPathSlash($folder->getPath()) . $entry);
+                    }
                 }
             }
             closedir($handle);
         }
-        return [];
+        $result = $this->sortByName($result);
+
+        return $result;
     }
 
 
@@ -213,31 +250,16 @@ Class FileSystem implements FileSystemInterface
     public function getFiles(FolderInterface $folder)
     {
         $result = [];
-        $folders = [];
-        $files = [];
         if ($handle = opendir($folder->getPath())) {
             while (false !== ($entry = readdir($handle))) {
-                if ($entry != ".") {
-                    if (is_dir($this->setPathSlash($folder->getPath()) . $entry)) {
-                        if ($entry == "..") {
-                            if (realpath($folder->getPath()) != realpath($this->rootFolder->getPath())){
-                                $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
-                            }
-                        } else {
-                            $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
-                        }
-                    } else {
-                        $files[] = new File($this->setPathSlash($folder->getPath()) . $entry); //TODO
-                    }
+                if (! is_dir($this->setPathSlash($folder->getPath()) . $entry)) {
+                    $result[] = new File($this->setPathSlash($folder->getPath()) . $entry); //TODO
                 }
             }
             closedir($handle);
         }
 
-        $folders = $this->sortByName($folders);
-        $files = $this->sortByName($files);
-        $result = array_merge($result, $folders);
-        $result = array_merge($result, $files);
+        $result = $this->sortByName($result);
         return $result;
     }
 }

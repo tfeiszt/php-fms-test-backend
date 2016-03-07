@@ -130,7 +130,7 @@ Class FileService
         if ($this->isFolderExists($folder->getPath())) {
             $result['data']['entry_point'] = str_replace(dirname($this->configuration->rootFolder), '', $folder->getPath());
             $result['data']['entry_path'] =  $folder->getPath();
-            $result['data']['entities'] = $this->fileSystem->getFiles($folder);
+            $result['data']['entities'] = $this->getFilesAndFolders($folder);
         } else {
             $result['success'] = false;
             $result['message'] = 'Directory does not exist';
@@ -199,12 +199,12 @@ Class FileService
     }
 
 
-    private function copyRecursive($sourceFiles, $targetFolder)
+    private function copyRecursive($sourceFiles, Folder $targetFolder)
     {
         foreach($sourceFiles as $fileOrFolder) {
             if (get_class($fileOrFolder) == 'Folder') {
                 $newTarget = $this->getFolderOrCreateIfNecessary($this->fileSystem->setPathSlash($targetFolder->getPath()) . $fileOrFolder->getName());
-                $files = $this->fileSystem->getFiles($fileOrFolder);
+                $files = $this->getFilesAndFolders($fileOrFolder);
                 if (count($files) > 0) {
                     foreach($files as $k => $file) {
                         if ($file->getName() == '..') {
@@ -233,6 +233,31 @@ Class FileService
             $this->fileSystem->createFolder(new Folder($pathAndName), new Folder(dirname($pathAndName)));
         }
         return new Folder($pathAndName);
+    }
+
+    private function getFilesAndFolders(Folder $folder)
+    {
+        $result = [];
+        if (realpath($folder->getPath()) != realpath($this->fileSystem->getRootFolder()->getPath())) {
+            $parent =  new Folder(dirname($folder->getPath()));
+            $result[] = $parent->setName('..');
+        }
+
+        $result = array_merge($result, $this->fileSystem->getFolders($folder));
+        $result = array_merge($result, $this->fileSystem->getFiles($folder));
+        return $result;
+    }
+
+
+    public function getFileCount(Folder $folder)
+    {
+        return $this->fileSystem->getFileCount($folder);
+    }
+
+
+    public function getFileSizes(Folder $folder)
+    {
+        return $this->fileSystem->getDirectorySize($folder);
     }
 
 

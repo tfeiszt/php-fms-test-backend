@@ -78,7 +78,15 @@ class ManagerController extends ControllerBase
                     if (get_class($item) == 'File') {
                         $result['data']['entities'][$k] = $this->view->getPartial('manager/itemFile', array('item' => $item));
                     } else {
-                        $result['data']['entities'][$k] = $this->view->getPartial('manager/itemFolder', array('item' => $item));
+                        if ($item->getName() == '..') {
+                            $details = '';
+                        } else {
+                            $count = $this->fileService()->getFileCount($item);
+                            $count .= ((int)$count == 1) ? ' file' : ' files';
+                            $size = $this->fileService()->getFileSizes($item). 'Kb';
+                            $details = '[' . $count . ',' . $size . ']';
+                        }
+                        $result['data']['entities'][$k] = $this->view->getPartial('manager/itemFolder', array('item' => $item, 'details' => $details));
                     }
 
                 }
