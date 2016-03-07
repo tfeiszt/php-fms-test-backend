@@ -6,7 +6,7 @@
     <div class="col-lg-12 manager">
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-6 manager-left">
-                <div class="col-lg-12 manager-list">
+                <div class="col-lg-12 manager-list" data-gridname="left">
                     <div class="row">
                         <div id="result-list-left-header" class="col-lg-12 manager-header active">
                             Header
@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-6 manager-right">
-                <div class="col-lg-12 manager-list">
+                <div class="col-lg-12 manager-list" data-gridname="right">
                     <div class="row">
                         <div id="result-list-right-header" class="col-lg-12 manager-header">
                             Header
@@ -40,7 +40,7 @@
             <div id="controller" class="col-lg-12 manager-actions text-center">
                 <a class="btn btn-success btn-create-file" href="">Create File</a>
                 <a class="btn btn-success btn-create-folder" href="">Create Folder</a>
-                <a class="btn btn-success" href="">Copy</a>
+                <a class="btn btn-success btn-copy" href="">Copy</a>
                 <a class="btn btn-success" href="">Move</a>
                 <a class="btn btn-danger" href="">Delete</a>
             </div>

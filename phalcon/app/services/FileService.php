@@ -174,19 +174,16 @@ Class FileService
             $target = $request->getPost('target');
             $source = $request->getPost('source');
 
-            if (file_exists($this->fileSystem->setPathSlash($source) . $entry) && (file_exists($target) && is_directory($target))){
-                if (is_directory($entry)) {
-                    $soruceFolder = new Folder($this->fileSystem->setPathSlash($source). $entry);
+            if (file_exists($this->fileSystem->setPathSlash($source) . $entry) && (file_exists($target) && is_dir($target))){
+
+                $targetFolder =  new Folder($target);
+
+                if (is_dir($this->fileSystem->setPathSlash($source) . $entry)) {
+                    $sourceFolder = new Folder($this->fileSystem->setPathSlash($source). $entry);
+                    $result['data'] = $this->copyRecursive([$sourceFolder], $targetFolder);
                 } else {
                     $sourceFile =new File($this->fileSystem->setPathSlash($source) . $entry);
-
-                    $targetFolder =  new Folder($target);
-
-                    $file = new File();
-                    $file->setName($request->getPost('name'))
-                        ->setParentFolder($targetFolder)
-                        ->setContent($sourceFile->getContent());
-                    $result['data'] = $this->fileSystem->createFile($file, $targetFolder);
+                    $result['data'] = $this->copyRecursive([$sourceFile], $targetFolder);
                 }
 
             } else {
@@ -197,6 +194,34 @@ Class FileService
         } else {
             $result['success'] = false;
             $result['message'] = $this->concateMessages($messages);
+        }
+        return $result;
+    }
+
+
+    private function copyRecursive($sourceFiles, $targetFolder)
+    {
+        foreach($sourceFiles as $fileOrFolder) {
+            if (get_class($fileOrFolder) == 'Folder') {
+                $newTarget = $this->getFolderOrCreateIfNecessary($this->fileSystem->setPathSlash($targetFolder->getPath()) . $fileOrFolder->getName());
+                $files = $this->fileSystem->getFiles($fileOrFolder);
+                if (count($files) > 0) {
+                    foreach($files as $k => $file) {
+                        if ($file->getName() == '..') {
+                            unset($files[$k]);
+                        }
+                    }
+                    $result = $this->copyRecursive($files, $newTarget);
+                } else {
+                    $result = $newTarget;
+                }
+            } else {
+                $file = new File();
+                $file->setName($fileOrFolder->getName())
+                    ->setParentFolder($fileOrFolder->getParentFolder())
+                    ->setContent($fileOrFolder->getContent());
+                $result =  $this->fileSystem->createFile($file, $targetFolder);
+            }
         }
         return $result;
     }

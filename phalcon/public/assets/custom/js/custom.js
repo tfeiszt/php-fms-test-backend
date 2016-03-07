@@ -224,7 +224,6 @@ controlService = {
         this.grids.push(left);
         this.grids.push(right);
 
-
         this.controller.find('.btn-create-file').unbind('click');
         this.controller.find('.btn-create-file').bind('click', function(){
             controlService.modalFormFile.find('.modal-title').html('Create Textfile');
@@ -248,15 +247,34 @@ controlService = {
             return false;
         });
 
-        for(var i = 0; i < this.grids.length; i++ ){
-            this.grids[i].getList(this.grids[i]);
-        }
+        this.controller.find('.btn-copy').unbind('click');
+        this.controller.find('.btn-copy').bind('click', function(){
+            controlService.copyFile();
+            return false;
+        });
+
+        $('.manager-list').bind('click', function(){
+            controlService.setActiveByName($(this).attr('data-gridname'));
+        });
+
+        this.refreshGrids();
 
     },
+
 
     getActiveGrid: function(){
         for(var i = 0; i < this.grids.length; i++){
             if (this.grids[i].idGridHeaderItem.hasClass('active')){
+                return this.grids[i];
+            }
+        }
+        return false;
+    },
+
+
+    getInActiveGrid: function(){
+        for(var i = 0; i < this.grids.length; i++){
+            if (! this.grids[i].idGridHeaderItem.hasClass('active')){
                 return this.grids[i];
             }
         }
@@ -272,6 +290,24 @@ controlService = {
     refreshGrids: function(){
         for(var i = 0; i < this.grids.length; i++){
             this.grids[i].getList(this.grids[i]);
+        }
+    },
+
+
+    copyFile: function() {
+        source = this.getActiveGrid();
+        target = this.getInActiveGrid();
+        if (source.isSelected()) {
+            data = {};
+            data['name'] = source.getSelected().attr('id');
+            data['target'] = target.scope.data.data.entry_path;
+            data['source'] = source.scope.data.data.entry_path;
+            jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/copy', data, function (json) {
+                controlService.refreshGrids();
+            });
+        } else {
+            alert('No selected file');
+            return false;
         }
     },
 

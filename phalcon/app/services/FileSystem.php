@@ -103,7 +103,7 @@ Class FileSystem implements FileSystemInterface
      */
     public function deleteFile(FileInterface $file)
     {
-        return $file;
+        return (file_exists($file->getPath())) ? false : true;
     }
 
     /**
@@ -219,7 +219,13 @@ Class FileSystem implements FileSystemInterface
             while (false !== ($entry = readdir($handle))) {
                 if ($entry != ".") {
                     if (is_dir($this->setPathSlash($folder->getPath()) . $entry)) {
-                        $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
+                        if ($entry == "..") {
+                            if (realpath($folder->getPath()) != realpath($this->rootFolder->getPath())){
+                                $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
+                            }
+                        } else {
+                            $folders[] = new Folder($this->setPathSlash($folder->getPath()) . $entry); //TODO
+                        }
                     } else {
                         $files[] = new File($this->setPathSlash($folder->getPath()) . $entry); //TODO
                     }

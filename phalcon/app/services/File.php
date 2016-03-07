@@ -16,9 +16,10 @@ Class File implements FileInterface
         $this->setName(pathinfo($pathAndName, PATHINFO_BASENAME));
         $this->setParentFolder(new Folder(pathinfo($pathAndName, PATHINFO_DIRNAME)));
         if (file_exists($pathAndName)){
-            $this->setCreatedTime(filectime($pathAndName));
-            $this->setModifiedTime(filemtime($pathAndName));
-            $this->setSize(filesize($pathAndName));
+            $this->setCreatedTime(filectime($pathAndName))
+                ->setModifiedTime(filemtime($pathAndName))
+                ->setSize(filesize($pathAndName))
+                ->setContent(file_get_contents($pathAndName));
         }
     }
 
