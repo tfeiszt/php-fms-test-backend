@@ -93,7 +93,9 @@ Class FileSystem implements FileSystemInterface
      */
     public function renameFile(FileInterface $file, $newName)
     {
-        return $file;
+        rename($this->setPathSlash($file->getPath()) . $file->getName(), $newName);
+        $result = new File( $this->setPathSlash($file->getPath()) . $newName);
+        return $result;
     }
 
     /**
@@ -103,6 +105,7 @@ Class FileSystem implements FileSystemInterface
      */
     public function deleteFile(FileInterface $file)
     {
+        unlink($this->setPathSlash($file->getPath()) . $file->getName());
         return (file_exists($file->getPath())) ? false : true;
     }
 
@@ -147,9 +150,10 @@ Class FileSystem implements FileSystemInterface
      * @return bool
      */
     public function deleteFolder(FolderInterface $folder){
-        $files = array_diff(scandir($folder->getPath()), array('.','..'));
+        $files = $this->getFolders($folder);
+        $files = array_merge($files, $this->getFiles($folder));
         foreach ($files as $fileOrFolder) {
-            (is_dir($this->setPathSlash($folder->getPath()) . $fileOrFolder)) ? delTree($this->setPathSlash($folder->getPath()) . $fileOrFolder) : unlink($this->setPathSlash($folder->getPath()) . $fileOrFolder);
+            (get_class($fileOrFolder) == 'Folder') ? $this->deleteFolder($fileOrFolder) : unlink($this->setPathSlash($fileOrFolder->getPath()) . $fileOrFolder->getName());
         }
         return rmdir($this->setPathSlash($folder->getPath()));
     }
@@ -162,8 +166,9 @@ Class FileSystem implements FileSystemInterface
      * @return FolderInterface
      */
     public function renameFolder(FolderInterface $folder, $newName){
-
-        return $folder;
+        rename($this->setPathSlash($folder->getPath()), $newName);
+        $result = new Folder($newName);
+        return $result;
     }
     /**
      * @param FolderInterface $folder

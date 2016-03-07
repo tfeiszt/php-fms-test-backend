@@ -215,11 +215,13 @@ controlService = {
     controller: null,
     modalFormFile: null,
     modalFormFolder: null,
+    modalFormRename: null,
     grids: [],
 
     init: function(objData, left, right){
         this.modalFormFile = objData['modal_form_file'];
         this.modalFormFolder = objData['modal_form_folder'];
+        this.modalFormRename = objData['modal_form_rename'];
         this.controller = objData['controller'];
         this.grids.push(left);
         this.grids.push(right);
@@ -250,6 +252,30 @@ controlService = {
         this.controller.find('.btn-copy').unbind('click');
         this.controller.find('.btn-copy').bind('click', function(){
             controlService.copyFile();
+            return false;
+        });
+
+        this.controller.find('.btn-move').unbind('click');
+        this.controller.find('.btn-move').bind('click', function(){
+            controlService.moveFile();
+            return false;
+        });
+
+        this.controller.find('.btn-delete').unbind('click');
+        this.controller.find('.btn-delete').bind('click', function(){
+            controlService.deleteObject();
+            return false;
+        });
+
+        this.controller.find('.btn-rename').unbind('click');
+        this.controller.find('.btn-rename').bind('click', function(){
+            controlService.modalFormRename.find('.modal-title').html('Rename');
+            controlService.renameObject();
+            return false;
+        });
+        this.modalFormRename.find('#renameFormSave').unbind('click');
+        this.modalFormRename.find('#renameFormSave').bind('click', function(){
+            controlService.doRename();
             return false;
         });
 
@@ -298,19 +324,43 @@ controlService = {
         source = this.getActiveGrid();
         target = this.getInActiveGrid();
         if (source.isSelected()) {
-            data = {};
-            data['name'] = source.getSelected().attr('id');
-            data['target'] = target.scope.data.data.entry_path;
-            data['source'] = source.scope.data.data.entry_path;
-            jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/copy', data, function (json) {
-                controlService.refreshGrids();
-            });
+            if (source.getSelected().attr('id') != '..') {
+                data = {};
+                data['name'] = source.getSelected().attr('id');
+                data['target'] = target.scope.data.data.entry_path;
+                data['source'] = source.scope.data.data.entry_path;
+                jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/copy', data, function (json) {
+                    controlService.refreshGrids();
+                });
+            } else {
+                alert('You can\'t copy the parent folder');
+            }
         } else {
-            alert('No selected file');
+            alert('There is no selected file');
             return false;
         }
     },
 
+    moveFile: function(){
+        source = this.getActiveGrid();
+        target = this.getInActiveGrid();
+        if (source.isSelected()) {
+            if (source.getSelected().attr('id') != '..') {
+                data = {};
+                data['name'] = source.getSelected().attr('id');
+                data['target'] = target.scope.data.data.entry_path;
+                data['source'] = source.scope.data.data.entry_path;
+                jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/move', data, function (json) {
+                    controlService.refreshGrids();
+                });
+            } else {
+                alert('You can\'t move the parent folder');
+            }
+        } else {
+            alert('There is no selected file');
+            return false;
+        }
+    },
 
     createFile: function() {
         var activeGrid = this.getActiveGrid();
@@ -324,6 +374,59 @@ controlService = {
         this.modalFormFolder.modal('show');
     },
 
+    renameObject: function() {
+        source = this.getActiveGrid();
+        if (source.isSelected()) {
+            if (source.getSelected().attr('id') != '..') {
+                this.modalFormRename.find('input[name="name"]').val(source.getSelected().attr('id'));
+                this.modalFormRename.find('input[name="old_name"]').val(source.getSelected().attr('id'));
+                this.modalFormRename.find('input[name="parent"]').val(source.scope.data.data.entry_path);
+                this.modalFormRename.modal('show');
+                return false;
+            } else {
+                alert('You can\'t rename the parent folder');
+            }
+        } else {
+            alert('There is no selected file');
+            return false;
+        }
+    },
+
+    deleteObject: function() {
+        source = this.getActiveGrid();
+        if (source.isSelected()) {
+            if (source.getSelected().attr('id') != '..') {
+                if (confirm('Are you sure?')) {
+                    data = {parent: source.scope.data.data.entry_path, name: source.getSelected().attr('id')};
+                    jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/deleteObject', data, function (json) {
+                        var res = jasHelper.parseResult(json);
+                        if (res.success != true) {
+                            alert('Deletion has not been success');
+                        }
+                        controlService.refreshGrids();
+                        return false;
+                    });
+                    return false;
+                } else {
+                    return false;
+                }
+            } else {
+                alert('You can\'t remove the parent folder');
+            }
+        } else {
+            alert('There is no selected file');
+            return false;
+        }
+    },
+
+
+    doRename: function() {
+        data = this.modalFormRename.find('form').serialize();
+        jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/renameObject', data, function (json) {
+            controlService.refreshGrids();
+            controlService.modalFormRename.modal('hide');
+        });
+    },
 
     saveFile: function() {
         data = this.modalFormFile.find('form').serialize();
@@ -341,6 +444,7 @@ controlService = {
             controlService.modalFormFolder.modal('hide');
         });
     },
+
 
     setActiveByName: function(name) {
         for(var i = 0; i < this.grids.length; i++){

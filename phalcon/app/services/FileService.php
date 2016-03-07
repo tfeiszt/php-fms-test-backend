@@ -199,6 +199,66 @@ Class FileService
     }
 
 
+    public function move(Request $request)
+    {
+        $result = array('success' => true, 'data' => ['entry_point' => '', 'entities' => []], 'message' => '');
+
+        $validation = new Validation();
+        $validation->add(
+            'name',
+            new PresenceOf(
+                array(
+                    'message' => 'The name is required'
+                )
+            )
+        );
+        $validation->add(
+            'target',
+            new PresenceOf(
+                array(
+                    'message' => 'The target folder is required'
+                )
+            )
+        );
+        $validation->add(
+            'source',
+            new PresenceOf(
+                array(
+                    'message' => 'The source folder is required'
+                )
+            )
+        );
+        $messages = $validation->validate($_POST);
+        if (count($messages) === 0) {
+            $entry = $request->getPost('name');
+            $target = $request->getPost('target');
+            $source = $request->getPost('source');
+
+            if (file_exists($this->fileSystem->setPathSlash($source) . $entry) && (file_exists($target) && is_dir($target))){
+
+                $targetFolder =  new Folder($target);
+
+                if (is_dir($this->fileSystem->setPathSlash($source) . $entry)) {
+                    $sourceFolder = new Folder($this->fileSystem->setPathSlash($source). $entry);
+                    $result['data'] = $this->fileSystem->renameFolder($sourceFolder, $this->fileSystem->setPathSlash(realpath($targetFolder->getPath())) . $entry);
+                } else {
+                    $sourceFile =new File($this->fileSystem->setPathSlash($source) . $entry);
+                    $result['data'] = $this->fileSystem->renameFile($sourceFile, $this->fileSystem->setPathSlash(realpath($targetFolder->getPath())) . $entry);
+                }
+
+            } else {
+                $result['success'] = false;
+                $result['message'] = 'Invalid directory or filename';
+            }
+
+        } else {
+            $result['success'] = false;
+            $result['message'] = $this->concateMessages($messages);
+        }
+        return $result;
+    }
+
+
     private function copyRecursive($sourceFiles, Folder $targetFolder)
     {
         foreach($sourceFiles as $fileOrFolder) {
@@ -222,6 +282,113 @@ Class FileService
                     ->setContent($fileOrFolder->getContent());
                 $result =  $this->fileSystem->createFile($file, $targetFolder);
             }
+        }
+        return $result;
+    }
+
+
+    public function rename(Request $request)
+    {
+        $result = array('success' => true, 'data' => ['entry_point' => '', 'entities' => []], 'message' => '');
+
+        $validation = new Validation();
+        $validation->add(
+            'name',
+            new PresenceOf(
+                array(
+                    'message' => 'The name is required'
+                )
+            )
+        );
+        $validation->add(
+            'old_name',
+            new PresenceOf(
+                array(
+                    'message' => 'The source object is required'
+                )
+            )
+        );
+        $validation->add(
+            'parent',
+            new PresenceOf(
+                array(
+                    'message' => 'Location is required'
+                )
+            )
+        );
+        $messages = $validation->validate($_POST);
+        if (count($messages) === 0) {
+            $target = $request->getPost('name');
+            $source = $request->getPost('old_name');
+            $parent = $request->getPost('parent');
+
+            if (file_exists($this->fileSystem->setPathSlash($parent) . $source) && (! file_exists($this->fileSystem->setPathSlash($parent) . $target))){
+
+                if (is_dir($this->fileSystem->setPathSlash($parent) . $source)) {
+                    $sourceFolder = new Folder($this->fileSystem->setPathSlash($parent) . $source);
+                    $result['data'] = $this->fileSystem->renameFolder($sourceFolder, $this->setPathSlash(realpath(pathinfo($sourceFolder->getPath(), PATHINFO_DIRNAME))) . $target);
+                } else {
+                    $sourceFile =new File($this->fileSystem->setPathSlash($parent) . $source);
+                    $result['data'] = $this->fileSystem->renameFile($sourceFile, $this->setPathSlash(realpath(pathinfo($sourceFile->getPath(), PATHINFO_DIRNAME))) . $target);
+                }
+
+            } else {
+                $result['success'] = false;
+                $result['message'] = 'The file already exists';
+            }
+
+        } else {
+            $result['success'] = false;
+            $result['message'] = $this->concateMessages($messages);
+        }
+        return $result;
+    }
+
+
+    public function delete(Request $request)
+    {
+        $result = array('success' => true, 'data' => ['entry_point' => '', 'entities' => []], 'message' => '');
+
+        $validation = new Validation();
+        $validation->add(
+            'name',
+            new PresenceOf(
+                array(
+                    'message' => 'The name is required'
+                )
+            )
+        );
+        $validation->add(
+            'parent',
+            new PresenceOf(
+                array(
+                    'message' => 'Location is required'
+                )
+            )
+        );
+        $messages = $validation->validate($_POST);
+        if (count($messages) === 0) {
+            $source = $request->getPost('name');
+            $parent = $request->getPost('parent');
+
+            if (file_exists($this->fileSystem->setPathSlash($parent) . $source)){
+
+                if (is_dir($this->fileSystem->setPathSlash($parent) . $source)) {
+                    $sourceFolder = new Folder($this->fileSystem->setPathSlash($parent) . $source);
+                    $result['data'] = $this->fileSystem->deleteFolder($sourceFolder);
+                } else {
+                    $sourceFile =new File($this->fileSystem->setPathSlash($parent) . $source);
+                    $result['data'] = $this->fileSystem->deleteFile($sourceFile);
+                }
+
+            } else {
+                $result['success'] = false;
+                $result['message'] = 'The file does not exist';
+            }
+
+        } else {
+            $result['success'] = false;
+            $result['message'] = $this->concateMessages($messages);
         }
         return $result;
     }

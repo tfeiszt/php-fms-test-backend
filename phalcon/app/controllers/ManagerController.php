@@ -117,5 +117,65 @@ class ManagerController extends ControllerBase
 
         return $response;
     }
+
+
+    public function moveAction()
+    {
+        $this->view->disable();
+        $response = new Response();
+
+        $request = new Request();
+
+        if ($request->isPost()) {
+
+            if ($request->isAjax()) {
+                $result = $this->fileService()->move($request);
+            }
+        }
+
+        $response->setContent(json_encode(isset($result) ? $result : ['success' => false]));
+
+        return $response;
+    }
+
+
+    public function renameObjectAction()
+    {
+        $this->view->disable();
+        $response = new Response();
+
+        $request = new Request();
+
+        if ($request->isPost()) {
+
+            if ($request->isAjax()) {
+                $result = $this->fileService()->rename($request);
+            }
+        }
+
+        $response->setContent(json_encode(isset($result) ? $result : ['success' => false]));
+
+        return $response;
+    }
+
+
+    public function deleteObjectAction()
+    {
+        $this->view->disable();
+        $response = new Response();
+
+        $request = new Request();
+
+        if ($request->isPost()) {
+
+            if ($request->isAjax()) {
+                $result = $this->fileService()->delete($request);
+            }
+        }
+
+        $response->setContent(json_encode(isset($result) ? $result : ['success' => false]));
+
+        return $response;
+    }
 }
 

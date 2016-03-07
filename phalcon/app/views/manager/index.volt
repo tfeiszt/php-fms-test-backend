@@ -38,11 +38,12 @@
         </div>
         <div class="row">
             <div id="controller" class="col-lg-12 manager-actions text-center">
-                <a class="btn btn-success btn-create-file" href="">Create File</a>
-                <a class="btn btn-success btn-create-folder" href="">Create Folder</a>
-                <a class="btn btn-success btn-copy" href="">Copy</a>
-                <a class="btn btn-success" href="">Move</a>
-                <a class="btn btn-danger" href="">Delete</a>
+                <a class="btn btn-success btn-create-file" href="#">Create File</a>
+                <a class="btn btn-success btn-create-folder" href="#">Create Folder</a>
+                <a class="btn btn-success btn-copy" href="#">Copy</a>
+                <a class="btn btn-success btn-move" href="#">Move</a>
+                <a class="btn btn-success btn-rename" href="#">Rename</a>
+                <a class="btn btn-danger btn-delete" href="#">Delete</a>
             </div>
         </div>
     </div>
@@ -106,6 +107,33 @@
 </div>
 
 
+<div class="modal fade" id="renameForm" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="renameFormLabel">New Folder</h4>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="name">New Name</label>
+                        <input type="text" class="form-control" id="name" placeholder="New Name" value="" name="name">
+                    </div>
+                    <input type="hidden" name="old_name" value="">
+                    <input type="hidden" name="parent" value="">
+                </form>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button id="renameFormSave" type="button" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
 <script>
 
 
@@ -139,6 +167,7 @@
         initData['controller'] = $('#controller');
         initData['modal_form_file'] = $('#newFile');
         initData['modal_form_folder'] = $('#newFolder');
+        initData['modal_form_rename'] = $('#renameForm');
         controlService.init(initData, leftGrid, rightGrid);
 
     });
