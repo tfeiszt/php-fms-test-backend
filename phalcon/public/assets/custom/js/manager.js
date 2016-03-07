@@ -7,20 +7,12 @@ jasGridService = {
         grid.scope.data = null;
         grid.scope.params[jasApp.csrfName] = jasApp.csrfValue;
 
-        var p = grid.idGridItem.parents('.content')[0];
-        var loading = $('<div class="loading"><i class="fa fa-refresh fa-spin"></i></div>');
-
-        loading.appendTo(p);
-        loading.fadeIn();
-
         jasHttp.getData(grid.scope, function(scope, res){
             grid.scope = scope;
-            loading.fadeOut();
             grid.showList(grid, scope, jasHelper.parseResult(res));
 
         }, function(scope, scope, res){
             jasHelper.errorHandler(res)
-            loading.fadeOut();
         });
     },
 
@@ -155,103 +147,6 @@ jasGridService = {
 
         controlService.setActiveByName(grid.name);
 
-
-        /*
-         if (res.callbacks){
-         if (res.callbacks.length > 0){
-         var calls = res.callbacks;
-         for(i = 0; i < calls.length; i++){
-         var adder = new Function(calls[i]);
-         adder();
-         }
-         }
-         }
-
-
-         if (res.ajax_refresh_links){
-         if (res.ajax_refresh_links.length > 0){
-         var links = res.ajax_refresh_links;
-         for(i = 0; i < links.length; i++){
-         $(links[i]).unbind('click');
-         $(links[i]).click(function(e){
-         if (grid.behaviour.infinity) {
-         grid.clearSelected(grid);
-         $("#"+grid.idGridItem).empty();
-         }
-         grid.getList(grid, $(this).attr("href"));
-         grid.lastClickedItem = $(this);
-         return false;
-         });
-         }
-         }
-         }
-
-
-         if (res.ajax_action_links){
-         if (res.ajax_action_links.length > 0){
-         var links = res.ajax_action_links;
-         for(i = 0; i < links.length; i++){
-         $(links[i]).unbind('click');
-         $(links[i]).click(function(e){
-
-         grid.getResult(grid, $(this).attr("href"),jasApp.csrf, function(json){
-
-         if (!(typeof json =='object')){
-         var res = jQuery.parseJSON(json);
-         } else
-         {
-         var res = json;
-         }
-         if (res.success) {
-         if (! (Object.prototype.toString.call( res.data ) === '[object Object]')){
-         var adder = new Function(res.data);
-         adder();
-         }
-         }else
-         {
-         jasHelper.errorHandler(res);
-         }
-
-         });
-         return false;
-
-         });
-         }
-         }
-         }
-
-
-         if (res.ajax_delete_links){
-         if (res.ajax_delete_links.length > 0){
-         var links = res.ajax_delete_links;
-         for(i = 0; i < links.length; i++){
-         $(links[i]).unbind('click');
-         $(links[i]).click(function(e){
-         e.preventDefault();
-         if (confirm(grid.behaviour.are_u_sure)) {
-         grid.getResult(grid, $(this).attr("href"),jasApp.csrf,function(res){
-         if (grid.behaviour.refresh_after_delete) {
-         grid.getList(grid);
-         }
-         if (res.success) {
-         if (! (Object.prototype.toString.call( res.data ) === '[object Object]')){
-         var adder = new Function(res.data);
-         adder();
-         }
-         } else
-         {
-         jasHelper.errorHandler(res);
-         }
-
-         });
-
-         }
-         return false;
-         });
-         }
-         }
-         }
-         */
     },
 
     clearAjaxList: function(grid){
@@ -350,8 +245,6 @@ function jasGridInstance(objname, objData){
         }
     }
 
-    //console.log(this);
-
     this.getList = jasGridService.getAjaxList;
 
     this.showList = jasGridService.showAjaxList;
@@ -367,10 +260,6 @@ function jasGridInstance(objname, objData){
     this.clearSelected = jasGridService.clearGridSelection;
 
     this.clearList = jasGridService.clearAjaxList;
-
-    //this.showLoader = showAjaxLoader;
-
-    //this.hideLoader = hideAjaxLoader;
 
     this.clearList(this);
 
