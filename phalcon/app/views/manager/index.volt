@@ -147,7 +147,7 @@
         initData['behaviour'] = [];
         initData['behaviour']['infinity'] = false;
         initData['behaviour']['refresh_after_delete'] = true;
-        initData['behaviour']['no_result'] = '<div class="alert alert-warning">No data has found</div>'; //optional
+        initData['behaviour']['no_result'] = '<div class="alert">Please create a file.</div>'; //optional
 
         var leftGrid = new jasGridInstance('left',initData);
 
@@ -159,7 +159,7 @@
         initData['behaviour'] = [];
         initData['behaviour']['infinity'] = false;
         initData['behaviour']['refresh_after_delete'] = true;
-        initData['behaviour']['no_result'] = '<div class="alert alert-warning">No data has found</div>'; //optional
+        initData['behaviour']['no_result'] = '<div class="alert">Please create a file</div>'; //optional
 
         var rightGrid = new jasGridInstance('right',initData);
 

@@ -32,6 +32,9 @@ class ManagerController extends ControllerBase
 
             if ($request->isAjax()) {
                 $result = $this->fileService()->createFile($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'create', 'type' => get_class($result['data']), 'objname' => $result['data']->getName() ]);
+                }
             }
         }
 
@@ -54,6 +57,9 @@ class ManagerController extends ControllerBase
 
             if ($request->isAjax()) {
                 $result = $this->fileService()->createFolder($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'create', 'type' => get_class($result['data']), 'objname' => $result['data']->getName() ]);
+                }
             }
         }
 
@@ -110,6 +116,9 @@ class ManagerController extends ControllerBase
 
             if ($request->isAjax()) {
                 $result = $this->fileService()->copy($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'create', 'type' => get_class($result['data']), 'objname' => $result['data']->getName() ]);
+                }
             }
         }
 
@@ -130,6 +139,9 @@ class ManagerController extends ControllerBase
 
             if ($request->isAjax()) {
                 $result = $this->fileService()->move($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'move', 'type' => get_class($result['data']), 'objname' => $result['data']->getName() ]);
+                }
             }
         }
 
@@ -150,6 +162,9 @@ class ManagerController extends ControllerBase
 
             if ($request->isAjax()) {
                 $result = $this->fileService()->rename($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'rename', 'type' => get_class($result['data']), 'objname' => $result['data']->getName() ]);
+                }
             }
         }
 
@@ -169,13 +184,30 @@ class ManagerController extends ControllerBase
         if ($request->isPost()) {
 
             if ($request->isAjax()) {
+                $name  = $request->getPost('name');
+                $parent = $request->getPost('parent');
+                $obj = $this->fileService()->getFileOrFolder($this->fileService()->getPathAndName($parent, $name));
                 $result = $this->fileService()->delete($request);
+                if ($result['success']) {
+                    $this->log(['method' => 'delete', 'type' => get_class($obj), 'objname' => $obj->getName() ]);
+                }
             }
         }
 
         $response->setContent(json_encode(isset($result) ? $result : ['success' => false]));
 
         return $response;
+    }
+
+    protected function log($data)
+    {
+        $model = new Logs();
+
+        $model->method = $data['method'];
+        $model->type = $data['type'];
+        $model->objname = $data['objname'];
+        $model->created_at = Date('Y-m-d H:i');
+        return $model->save();
     }
 }
 

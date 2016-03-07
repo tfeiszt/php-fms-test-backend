@@ -326,10 +326,10 @@ Class FileService
 
                 if (is_dir($this->fileSystem->setPathSlash($parent) . $source)) {
                     $sourceFolder = new Folder($this->fileSystem->setPathSlash($parent) . $source);
-                    $result['data'] = $this->fileSystem->renameFolder($sourceFolder, $this->setPathSlash(realpath(pathinfo($sourceFolder->getPath(), PATHINFO_DIRNAME))) . $target);
+                    $result['data'] = $this->fileSystem->renameFolder($sourceFolder, $this->fileSystem->setPathSlash(realpath(pathinfo($sourceFolder->getPath(), PATHINFO_DIRNAME))) . $target);
                 } else {
                     $sourceFile =new File($this->fileSystem->setPathSlash($parent) . $source);
-                    $result['data'] = $this->fileSystem->renameFile($sourceFile, $this->setPathSlash(realpath(pathinfo($sourceFile->getPath(), PATHINFO_DIRNAME))) . $target);
+                    $result['data'] = $this->fileSystem->renameFile($sourceFile, $this->fileSystem->setPathSlash(realpath($sourceFile->getPath())) . $target);
                 }
 
             } else {
@@ -402,6 +402,7 @@ Class FileService
         return new Folder($pathAndName);
     }
 
+
     private function getFilesAndFolders(Folder $folder)
     {
         $result = [];
@@ -448,6 +449,26 @@ Class FileService
         $result->fileExtension = pathinfo($pathAndName, PATHINFO_EXTENSION);
         $result->fileName = pathinfo($pathAndName, PATHINFO_FILENAME);
         return $result;
+    }
+
+
+    public function getPathAndName($path, $name)
+    {
+        return $this->fileSystem->setPathSlash($path) . $name;
+    }
+
+
+    public function getFileOrFolder($pathAndName)
+    {
+        if (file_exists($pathAndName)) {
+            if (is_dir($pathAndName)) {
+                return new Folder($pathAndName);
+            } else {
+                return new File($pathAndName);
+            }
+        } else {
+            return false;
+        }
     }
 
 }

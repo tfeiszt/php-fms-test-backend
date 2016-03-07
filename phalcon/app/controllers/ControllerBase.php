@@ -10,6 +10,7 @@ class ControllerBase extends Controller
 
     public function initialize()
     {
+        date_default_timezone_set('Europe/London');
         $di = \Phalcon\DI\FactoryDefault::getDefault();
         $configFile = require APP_PATH . '/app/config/siteConfig.php';
         $config = new Config($configFile);
