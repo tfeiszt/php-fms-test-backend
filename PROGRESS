@@ -3,12 +3,13 @@ For first sight: It's pretty usable, seems fine. I like the structure of the cod
 
 The task: I should create a "File manager system". Task description doesn't mention any exact expectations how should it work, but mention I can use db if I want.
 I checked the attached interfaces and those implies it should be handle actually files too.
-So my goal is: I trying to make a web application which is like an old "Norton Commander". It has two file list panel and an action bar. User can do the basic file actions such as:
+So my goal is: I trying to make a web application which is similar like an old "Norton Commander". It has two file list panel and an action bar. User can do the basic file actions such as:
 - creating a txt file
 - creating a folder
-- copy a file
-- move a file (using the move to rename as well)
-- delete a file
+- copy a file or a folder
+- move a file or a folder
+- rename a file or a folder
+- delete a file or a folder (recursive)
 
 All this actions will be logged into a mysql table.
 
@@ -21,4 +22,35 @@ For this I will use the following technologies:
 - less
 - npm
 - grunt
+
+
+
+
+Conclusion:
+
+Please note: This is my first Phalcon application, so this is the reason if something is not organised in the nicest "phalcon way".
+During the development I've tried to keep the file handler functions out of the controller. I use a service for it called "fileService.php". This service handle the filesystem operations through the founded interfaces.
+Phalcon is a pretty usable framework for first sight. I really enjoyed the work in that.
+Unfortunately I couldn't implement everything that I wanted because the short time, but I guess it was enough to demonstrate my coding approach.
+
+
+Before you try it:
+- Set up a virtual host on your local
+- build a database with a name.
+- Run that database schema that I attached in folder "database"
+- Set the database credentials in "/app/config/config.php"
+- Set the root domain (your virtual host) in "/app/config/config" (application->baseUri)
+- Set the root file store folder in "/app/config/siteConfig" (fileService section) Default: APP_PATH . '/public/files/' This folder must have appropriate permissions.
+
+
+Improvement possibilities that I didn't implemented because the short time.
+- xss sanitize on POST variables
+- csrf defend on POST requests
+- professional exception handling
+
+
+
+
+
+
 

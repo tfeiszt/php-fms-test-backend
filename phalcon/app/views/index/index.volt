@@ -22,7 +22,7 @@
             <li>Ajax</li>
             <li>Bootstrap 3 + Sandstone theme</li>
             <li>Less</li>
-            <li>Composer</li>
+            <li>Npm</li>
             <li>Grunt</li>
         </ul>
     </div>
@@ -31,7 +31,7 @@
 <div class="row">
     <div class="col-lg-12">
         <p class="text-center">
-            <a href="{{url('manager/index')}}" class="btn btn-primary btn-lg">File Manager</a>
+            <a href="{{url('manager/index')}}" class="btn btn-success btn-lg">File Manager</a>
         </p>
     </div>
 </div>

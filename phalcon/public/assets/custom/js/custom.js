@@ -364,12 +364,15 @@ controlService = {
 
     createFile: function() {
         var activeGrid = this.getActiveGrid();
+        this.modalFormFile.find('input[name="name"]').val('');
+        this.modalFormFile.find('textarea[name="content"]').val('');
         this.modalFormFile.find('input[name="parent"]').val(activeGrid.scope.data.data.entry_path);
         this.modalFormFile.modal('show');
     },
 
     createFolder: function() {
         var activeGrid = this.getActiveGrid();
+        this.modalFormFolder.find('input[name="name"]').val('');
         this.modalFormFolder.find('input[name="parent"]').val(activeGrid.scope.data.data.entry_path);
         this.modalFormFolder.modal('show');
     },
