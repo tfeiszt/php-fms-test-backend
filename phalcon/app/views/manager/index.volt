@@ -62,7 +62,7 @@
                 <form>
                     <div class="form-group">
                         <label for="name">Filename</label>
-                        <input type="text" class="form-control" id="name" placeholder="Filename" value="" name="name">
+                        <input type="text" class="form-control" id="name" placeholder="Filename" value="" name="name" >
                     </div>
                     <div class="form-group">
                         <label for="content">Content</label>

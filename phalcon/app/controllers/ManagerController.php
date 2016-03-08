@@ -89,7 +89,7 @@ class ManagerController extends ControllerBase
                         } else {
                             $count = $this->fileService()->getFileCount($item);
                             $count .= ((int)$count == 1) ? ' file' : ' files';
-                            $size = $this->fileService()->getFileSizes($item). 'Kb';
+                            $size = $this->fileService()->getFileSizes($item). 'B';
                             $details = '[' . $count . ',' . $size . ']';
                         }
                         $result['data']['entities'][$k] = $this->view->getPartial('manager/itemFolder', array('item' => $item, 'details' => $details));

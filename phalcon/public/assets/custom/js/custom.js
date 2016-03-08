@@ -426,16 +426,24 @@ controlService = {
     doRename: function() {
         data = this.modalFormRename.find('form').serialize();
         jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/renameObject', data, function (json) {
-            controlService.refreshGrids();
-            controlService.modalFormRename.modal('hide');
+            if (jasHelper.parseResult(json).success) {
+                controlService.refreshGrids();
+                controlService.modalFormRename.modal('hide');
+            } else {
+                alert(jasHelper.parseResult(json).message);
+            }
         });
     },
 
     saveFile: function() {
         data = this.modalFormFile.find('form').serialize();
         jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFile', data, function (json) {
-            controlService.refreshGrids();
-            controlService.modalFormFile.modal('hide');
+            if (jasHelper.parseResult(json).success) {
+                controlService.refreshGrids();
+                controlService.modalFormFile.modal('hide');
+            } else {
+                alert(jasHelper.parseResult(json).message);
+            }
         });
 
     },
@@ -443,8 +451,12 @@ controlService = {
     saveFolder: function() {
         data = this.modalFormFolder.find('form').serialize();
         jasHttp.simpleAjaxPost(jasApp.rootUrl + 'manager/createFolder', data, function (json) {
-            controlService.refreshGrids();
-            controlService.modalFormFolder.modal('hide');
+            if (jasHelper.parseResult(json).success) {
+                controlService.refreshGrids();
+                controlService.modalFormFolder.modal('hide');
+            } else {
+                alert(jasHelper.parseResult(json).message);
+            }
         });
     },
 
